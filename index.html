@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Gratitude">
+<meta name="theme-color" content="#FFF8E7">
+<title>Gratitude Journal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+--sun-100: #FFFDF5;
+--sun-200: #FFF8E7;
+--sun-300: #FFEFC2;
+--sun-400: #FFE49A;
+--sun-500: #FFD666;
+--sun-600: #F5B942;
+--sun-700: #E8981E;
+--sun-800: #C47A10;
+--sun-900: #8B5A0A;
+--warm-white: #FFFCF4;
+--text-primary: #5C3D0E;
+--text-secondary: #8B6B3A;
+--text-muted: #B89A6A;
+--danger: #D4644A;
+--danger-hover: #B8503A;
+--card-shadow: 0 2px 12px rgba(139, 90, 10, 0.08), 0 1px 3px rgba(139, 90, 10, 0.05);
+--card-shadow-hover: 0 4px 20px rgba(139, 90, 10, 0.12), 0 2px 6px rgba(139, 90, 10, 0.08);
+--radius: 16px;
+--radius-sm: 10px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+font-family: 'Source Serif 4', Georgia, serif;
+background: var(--sun-200);
+color: var(--text-primary);
+min-height: 100dvh;
+padding-bottom: 100px;
+overflow-x: hidden;
+}
+
+body::before {
+content: '';
+position: fixed;
+inset: 0;
+background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+pointer-events: none;
+z-index: 0;
+}
+
+.container {
+max-width: 600px;
+margin: 0 auto;
+padding: 0 16px;
+position: relative;
+z-index: 1;
+}
+
+.header {
+text-align: center;
+padding: 28px 0 20px;
+position: relative;
+}
+
+.header h1 {
+font-family: 'Playfair Display', Georgia, serif;
+font-weight: 800;
+font-size: 2rem;
+color: var(--sun-800);
+letter-spacing: -0.02em;
+line-height: 1.1;
+}
+
+.header h1 .sun { display: inline-block; animation: sunPulse 3s ease-in-out infinite; }
+
+@keyframes sunPulse {
+0%, 100% { transform: scale(1); }
+50% { transform: scale(1.12) rotate(8deg); }
+}
+
+.header p {
+font-size: 0.95rem;
+color: var(--text-secondary);
+margin-top: 4px;
+font-style: italic;
+font-weight: 300;
+}
+
+.storage-bar-wrap {
+margin: 0 0 16px;
+padding: 10px 14px;
+background: var(--warm-white);
+border-radius: var(--radius-sm);
+border: 1px solid var(--sun-300);
+}
+
+.storage-label {
+display: flex;
+justify-content: space-between;
+font-size: 0.75rem;
+color: var(--text-muted);
+margin-bottom: 5px;
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 0.04em;
+}
+
+.storage-track {
+height: 6px;
+background: var(--sun-300);
+border-radius: 3px;
+overflow: hidden;
+}
+
+.storage-fill {
+height: 100%;
+background: linear-gradient(90deg, var(--sun-500), var(--sun-700));
+border-radius: 3px;
+transition: width 0.5s ease;
+}
+
+.storage-fill.warn { background: linear-gradient(90deg, #F5B942, var(--danger)); }
+
+.form-card {
+background: var(--warm-white);
+border-radius: var(--radius);
+padding: 20px;
+box-shadow: var(--card-shadow);
+border: 1.5px solid var(--sun-300);
+margin-bottom: 24px;
+}
+
+.form-card textarea {
+width: 100%;
+min-height: 120px;
+border: 1.5px solid var(--sun-300);
+border-radius: var(--radius-sm);
+padding: 14px 16px;
+font-family: 'Source Serif 4', Georgia, serif;
+font-size: 1rem;
+color: var(--text-primary);
+background: var(--sun-100);
+resize: vertical;
+outline: none;
+transition: border-color 0.2s, box-shadow 0.2s;
+line-height: 1.6;
+}
+
+.form-card textarea::placeholder { color: var(--text-muted); font-style: italic; }
+.form-card textarea:focus {
+border-color: var(--sun-500);
+box-shadow: 0 0 0 3px rgba(255, 214, 102, 0.3);
+}
+
+.form-actions {
+display: flex;
+gap: 10px;
+margin-top: 14px;
+flex-wrap: wrap;
+}
+
+.btn {
+display: inline-flex;
+align-items: center;
+gap: 7px;
+padding: 12px 20px;
+border-radius: 50px;
+border: none;
+font-family: 'Source Serif 4', Georgia, serif;
+font-size: 0.92rem;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.2s ease;
+white-space: nowrap;
+}
+
+.btn-photo {
+background: var(--sun-200);
+color: var(--text-secondary);
+border: 1.5px solid var(--sun-400);
+}
+.btn-photo:hover { background: var(--sun-300); }
+
+.btn-add {
+background: linear-gradient(135deg, var(--sun-500), var(--sun-700));
+color: #fff;
+flex: 1;
+justify-content: center;
+box-shadow: 0 2px 8px rgba(232, 152, 30, 0.3);
+}
+.btn-add:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(232, 152, 30, 0.4); }
+.btn-add:active { transform: translateY(0); }
+
+.photo-preview-wrap {
+margin-top: 12px;
+position: relative;
+display: none;
+}
+.photo-preview-wrap.active { display: block; }
+
+.photo-preview {
+width: 100%;
+max-height: 200px;
+object-fit: cover;
+border-radius: var(--radius-sm);
+border: 1.5px solid var(--sun-300);
+}
+
+.photo-remove {
+position: absolute;
+top: 8px;
+right: 8px;
+width: 28px;
+height: 28px;
+border-radius: 50%;
+background: rgba(0,0,0,0.55);
+color: #fff;
+border: none;
+font-size: 1rem;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+backdrop-filter: blur(4px);
+}
+
+.photo-size-info {
+font-size: 0.75rem;
+color: var(--text-muted);
+margin-top: 6px;
+text-align: right;
+}
+
+.entry-count {
+text-align: center;
+font-size: 0.82rem;
+color: var(--text-muted);
+margin-top: 10px;
+font-weight: 600;
+}
+
+#photoInput { display: none; }
+
+.entries-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 14px;
+}
+
+.entries-title {
+font-family: 'Playfair Display', Georgia, serif;
+font-weight: 700;
+font-size: 1.15rem;
+color: var(--sun-800);
+}
+
+.sort-btn {
+background: none;
+border: 1px solid var(--sun-400);
+color: var(--text-secondary);
+padding: 5px 12px;
+border-radius: 20px;
+font-size: 0.75rem;
+cursor: pointer;
+font-family: 'Source Serif 4', Georgia, serif;
+font-weight: 600;
+}
+.sort-btn:hover { background: var(--sun-200); }
+
+.entry-card {
+background: var(--warm-white);
+border-radius: var(--radius);
+padding: 18px;
+box-shadow: var(--card-shadow);
+border: 1px solid var(--sun-300);
+margin-bottom: 14px;
+transition: box-shadow 0.2s;
+animation: slideIn 0.35s ease-out;
+}
+
+@keyframes slideIn {
+from { opacity: 0; transform: translateY(12px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.entry-card:hover { box-shadow: var(--card-shadow-hover); }
+
+.entry-date {
+font-size: 0.78rem;
+color: var(--text-muted);
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 0.04em;
+margin-bottom: 8px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+
+.entry-text {
+font-size: 0.98rem;
+line-height: 1.7;
+color: var(--text-primary);
+white-space: pre-wrap;
+word-wrap: break-word;
+}
+
+.entry-photo {
+width: 100%;
+max-height: 300px;
+object-fit: cover;
+border-radius: var(--radius-sm);
+margin-top: 12px;
+cursor: pointer;
+transition: transform 0.2s;
+}
+.entry-photo:hover { transform: scale(1.01); }
+
+.entry-delete {
+background: none;
+border: none;
+color: var(--text-muted);
+font-size: 0.8rem;
+cursor: pointer;
+padding: 3px 8px;
+border-radius: 6px;
+transition: all 0.2s;
+font-family: 'Source Serif 4', Georgia, serif;
+}
+.entry-delete:hover { color: var(--danger); background: rgba(212, 100, 74, 0.08); }
+
+.empty-state {
+text-align: center;
+padding: 50px 20px;
+color: var(--text-muted);
+}
+
+.empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+.empty-state p { font-size: 1rem; font-style: italic; }
+
+.lightbox {
+display: none;
+position: fixed;
+inset: 0;
+background: rgba(0,0,0,0.85);
+z-index: 1000;
+align-items: center;
+justify-content: center;
+backdrop-filter: blur(6px);
+padding: 20px;
+}
+.lightbox.active { display: flex; }
+
+.lightbox img {
+max-width: 100%;
+max-height: 90vh;
+border-radius: 8px;
+object-fit: contain;
+}
+
+.lightbox-close {
+position: absolute;
+top: 16px;
+right: 16px;
+width: 40px;
+height: 40px;
+border-radius: 50%;
+background: rgba(255,255,255,0.15);
+color: #fff;
+border: none;
+font-size: 1.4rem;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.dialog-overlay {
+display: none;
+position: fixed;
+inset: 0;
+background: rgba(0,0,0,0.4);
+z-index: 999;
+align-items: center;
+justify-content: center;
+padding: 20px;
+backdrop-filter: blur(3px);
+}
+.dialog-overlay.active { display: flex; }
+
+.dialog {
+background: var(--warm-white);
+border-radius: var(--radius);
+padding: 24px;
+max-width: 340px;
+width: 100%;
+text-align: center;
+box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+}
+
+.dialog h3 {
+font-family: 'Playfair Display', Georgia, serif;
+color: var(--sun-800);
+margin-bottom: 8px;
+}
+
+.dialog p { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 18px; }
+
+.dialog-actions { display: flex; gap: 10px; }
+
+.dialog-actions .btn {
+flex: 1;
+justify-content: center;
+padding: 10px 16px;
+}
+
+.btn-cancel {
+background: var(--sun-200);
+color: var(--text-secondary);
+border: 1px solid var(--sun-400);
+}
+
+.btn-danger {
+background: var(--danger);
+color: #fff;
+}
+.btn-danger:hover { background: var(--danger-hover); }
+
+.settings-toggle {
+position: fixed;
+bottom: 20px;
+right: 20px;
+width: 48px;
+height: 48px;
+border-radius: 50%;
+background: linear-gradient(135deg, var(--sun-500), var(--sun-700));
+color: #fff;
+border: none;
+font-size: 1.3rem;
+cursor: pointer;
+box-shadow: 0 3px 12px rgba(232, 152, 30, 0.35);
+z-index: 100;
+display: flex;
+align-items: center;
+justify-content: center;
+transition: transform 0.2s;
+}
+.settings-toggle:hover { transform: scale(1.08); }
+
+.settings-panel {
+display: none;
+position: fixed;
+bottom: 80px;
+right: 20px;
+background: var(--warm-white);
+border-radius: var(--radius);
+padding: 18px;
+box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+z-index: 100;
+width: 280px;
+border: 1px solid var(--sun-300);
+}
+.settings-panel.active { display: block; }
+
+.settings-panel h4 {
+font-family: 'Playfair Display', Georgia, serif;
+color: var(--sun-800);
+margin-bottom: 12px;
+font-size: 1rem;
+}
+
+.setting-row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 8px 0;
+border-bottom: 1px solid var(--sun-200);
+font-size: 0.85rem;
+color: var(--text-secondary);
+}
+
+.setting-row:last-child { border-bottom: none; }
+
+.setting-row select {
+padding: 4px 8px;
+border: 1px solid var(--sun-400);
+border-radius: 6px;
+background: var(--sun-100);
+font-family: 'Source Serif 4', Georgia, serif;
+color: var(--text-primary);
+font-size: 0.82rem;
+}
+
+.btn-export {
+width: 100%;
+margin-top: 10px;
+background: var(--sun-200);
+color: var(--text-secondary);
+border: 1px solid var(--sun-400);
+justify-content: center;
+padding: 9px 14px;
+font-size: 0.82rem;
+}
+
+.btn-import {
+width: 100%;
+background: var(--sun-300);
+color: var(--text-primary);
+border: 1px solid var(--sun-400);
+justify-content: center;
+padding: 9px 14px;
+font-size: 0.82rem;
+}
+
+.toast {
+position: fixed;
+bottom: 80px;
+left: 50%;
+transform: translateX(-50%) translateY(20px);
+background: var(--text-primary);
+color: var(--sun-100);
+padding: 10px 22px;
+border-radius: 50px;
+font-size: 0.85rem;
+font-family: 'Source Serif 4', Georgia, serif;
+opacity: 0;
+transition: all 0.3s ease;
+z-index: 1001;
+pointer-events: none;
+white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.search-wrap {
+margin-bottom: 16px;
+}
+
+.search-wrap input {
+width: 100%;
+padding: 11px 16px 11px 40px;
+border: 1.5px solid var(--sun-300);
+border-radius: 50px;
+font-family: 'Source Serif 4', Georgia, serif;
+font-size: 0.9rem;
+color: var(--text-primary);
+background: var(--warm-white);
+outline: none;
+transition: border-color 0.2s;
+}
+.search-wrap input::placeholder { color: var(--text-muted); }
+.search-wrap input:focus { border-color: var(--sun-500); }
+
+.search-wrap { position: relative; }
+.search-icon {
+position: absolute;
+left: 14px;
+top: 50%;
+transform: translateY(-50%);
+color: var(--text-muted);
+font-size: 0.9rem;
+pointer-events: none;
+}
+
+@media (max-width: 400px) {
+.header h1 { font-size: 1.7rem; }
+.form-card { padding: 16px; }
+.entry-card { padding: 14px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<div class="header">
+<h1><span class="sun">&#9728;&#65039;</span> Gratitude Journal <span style="font-size:0.85em">&#10024;</span></h1>
+<p>What are you grateful for today?</p>
+</div>
+
+<div class="storage-bar-wrap">
+<div class="storage-label">
+<span>Storage</span>
+<span id="storageText">0 / 5 MB</span>
+</div>
+<div class="storage-track">
+<div class="storage-fill" id="storageFill" style="width:0%"></div>
+</div>
+</div>
+
+<div class="form-card">
+<textarea id="entryText" placeholder="Today I'm grateful for..." rows="4"></textarea>
+
+<div class="photo-preview-wrap" id="previewWrap">
+<img id="previewImg" class="photo-preview" src="" alt="Preview">
+<button class="photo-remove" onclick="clearPhoto()" aria-label="Remove photo">&#10005;</button>
+<div class="photo-size-info" id="photoSizeInfo"></div>
+</div>
+
+<div class="form-actions">
+<button class="btn btn-photo" onclick="document.getElementById('photoInput').click()">
+&#128247; Add Photo
+</button>
+<button class="btn btn-add" onclick="addEntry()">
++ Add Entry
+</button>
+</div>
+<input type="file" id="photoInput" accept="image/*" onchange="handlePhoto(this)">
+<div class="entry-count" id="entryCount"></div>
+</div>
+
+<div class="search-wrap" id="searchWrap" style="display:none">
+<span class="search-icon">&#128269;</span>
+<input type="text" id="searchInput" placeholder="Search entries..." oninput="renderEntries()">
+</div>
+
+<div id="entriesHeader" class="entries-header" style="display:none">
+<span class="entries-title">Your Entries</span>
+<button class="sort-btn" id="sortBtn" onclick="toggleSort()">Newest first</button>
+</div>
+<div id="entriesList"></div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+<button class="lightbox-close" aria-label="Close">&#10005;</button>
+<img id="lightboxImg" src="" alt="Full photo">
+</div>
+
+<div class="dialog-overlay" id="deleteDialog">
+<div class="dialog">
+<h3>Delete Entry?</h3>
+<p>This can't be undone.</p>
+<div class="dialog-actions">
+<button class="btn btn-cancel" onclick="closeDeleteDialog()">Cancel</button>
+<button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+</div>
+</div>
+</div>
+
+<button class="settings-toggle" onclick="toggleSettings()" aria-label="Settings">&#9881;</button>
+<div class="settings-panel" id="settingsPanel">
+<h4>&#9881; Settings</h4>
+<div class="setting-row">
+<span>Photo Quality</span>
+<select id="qualitySetting" onchange="saveSettings()">
+<option value="0.3">Low (max storage)</option>
+<option value="0.45" selected>Medium</option>
+<option value="0.6">High</option>
+</select>
+</div>
+<div class="setting-row">
+<span>Max Photo Width</span>
+<select id="maxWidthSetting" onchange="saveSettings()">
+<option value="600">600px (smallest)</option>
+<option value="800" selected>800px</option>
+<option value="1024">1024px</option>
+</select>
+</div>
+<button class="btn btn-export" onclick="exportData()">&#128229; Export All Entries</button>
+<button class="btn btn-import" onclick="document.getElementById('importInput').click()" style="margin-top:6px">&#128228; Import Entries</button>
+<input type="file" id="importInput" accept=".json" onchange="importData(this)" style="display:none">
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var entries = [];
+var pendingPhoto = null;
+var sortNewest = true;
+var deleteTargetId = null;
+
+var STORAGE_KEY = 'gratitude_journal_entries';
+var SETTINGS_KEY = 'gratitude_journal_settings';
+var MAX_STORAGE = 5 * 1024 * 1024;
+
+function init() {
+loadSettings();
+loadEntries();
+renderEntries();
+updateStorage();
+}
+
+function loadSettings() {
+try {
+var s = JSON.parse(localStorage.getItem(SETTINGS_KEY));
+if (s) {
+document.getElementById('qualitySetting').value = s.quality || '0.45';
+document.getElementById('maxWidthSetting').value = s.maxWidth || '800';
+}
+} catch(e) {}
+}
+
+function saveSettings() {
+var settings = {
+quality: document.getElementById('qualitySetting').value,
+maxWidth: document.getElementById('maxWidthSetting').value
+};
+localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+showToast('Settings saved');
+}
+
+function getQuality() { return parseFloat(document.getElementById('qualitySetting').value); }
+function getMaxWidth() { return parseInt(document.getElementById('maxWidthSetting').value); }
+
+function getStorageUsed() {
+var total = 0;
+for (var key in localStorage) {
+if (localStorage.hasOwnProperty(key)) {
+total += localStorage.getItem(key).length * 2;
+}
+}
+return total;
+}
+
+function updateStorage() {
+var used = getStorageUsed();
+var pct = Math.min((used / MAX_STORAGE) * 100, 100);
+var usedMB = (used / (1024 * 1024)).toFixed(2);
+var totalMB = (MAX_STORAGE / (1024 * 1024)).toFixed(0);
+
+document.getElementById('storageFill').style.width = pct + '%';
+document.getElementById('storageText').textContent = usedMB + ' / ' + totalMB + ' MB';
+
+var fill = document.getElementById('storageFill');
+if (pct > 80) fill.classList.add('warn');
+else fill.classList.remove('warn');
+}
+
+function compressImage(file) {
+return new Promise(function(resolve, reject) {
+var reader = new FileReader();
+reader.onload = function(e) {
+var img = new Image();
+img.onload = function() {
+var canvas = document.createElement('canvas');
+var maxW = getMaxWidth();
+var w = img.width;
+var h = img.height;
+
+if (w > maxW) {
+h = Math.round(h * maxW / w);
+w = maxW;
+}
+
+canvas.width = w;
+canvas.height = h;
+
+var ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = true;
+ctx.imageSmoothingQuality = 'medium';
+ctx.drawImage(img, 0, 0, w, h);
+
+var quality = getQuality();
+var dataUrl = canvas.toDataURL('image/jpeg', quality);
+var sizeKB = Math.round((dataUrl.length * 3 / 4) / 1024);
+
+resolve({ dataUrl: dataUrl, sizeKB: sizeKB, width: w, height: h });
+};
+img.onerror = reject;
+img.src = e.target.result;
+};
+reader.onerror = reject;
+reader.readAsDataURL(file);
+});
+}
+
+function handlePhoto(input) {
+var file = input.files[0];
+if (!file) return;
+
+compressImage(file).then(function(result) {
+pendingPhoto = result.dataUrl;
+
+var wrap = document.getElementById('previewWrap');
+var img = document.getElementById('previewImg');
+var info = document.getElementById('photoSizeInfo');
+
+img.src = result.dataUrl;
+info.textContent = result.width + ' x ' + result.height + ' - ' + result.sizeKB + ' KB compressed';
+wrap.classList.add('active');
+}).catch(function() {
+showToast('Error processing photo');
+});
+
+input.value = '';
+}
+
+function clearPhoto() {
+pendingPhoto = null;
+document.getElementById('previewWrap').classList.remove('active');
+document.getElementById('previewImg').src = '';
+}
+
+function loadEntries() {
+try {
+entries = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+} catch(e) { entries = []; }
+}
+
+function saveEntries() {
+try {
+localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+} catch(e) {
+showToast('Storage full! Try lower quality or delete old entries.');
+return false;
+}
+return true;
+}
+
+function addEntry() {
+var text = document.getElementById('entryText').value.trim();
+if (!text) {
+showToast('Write something you are grateful for!');
+document.getElementById('entryText').focus();
+return;
+}
+
+var entry = {
+id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+text: text,
+date: new Date().toISOString(),
+photo: pendingPhoto || null
+};
+
+entries.unshift(entry);
+
+if (!saveEntries()) {
+entries.shift();
+return;
+}
+
+document.getElementById('entryText').value = '';
+clearPhoto();
+renderEntries();
+updateStorage();
+showToast('Entry added!');
+}
+
+function deleteEntry(id) {
+deleteTargetId = id;
+document.getElementById('deleteDialog').classList.add('active');
+document.getElementById('confirmDeleteBtn').onclick = function() {
+entries = entries.filter(function(e) { return e.id !== deleteTargetId; });
+saveEntries();
+renderEntries();
+updateStorage();
+closeDeleteDialog();
+showToast('Entry deleted');
+};
+}
+
+function closeDeleteDialog() {
+document.getElementById('deleteDialog').classList.remove('active');
+deleteTargetId = null;
+}
+
+function renderEntries() {
+var list = document.getElementById('entriesList');
+var search = document.getElementById('searchInput').value.toLowerCase();
+
+var filtered = entries;
+if (search) {
+filtered = entries.filter(function(e) { return e.text.toLowerCase().indexOf(search) !== -1; });
+}
+
+var sorted = filtered.slice();
+if (!sortNewest) sorted.reverse();
+
+var photoCount = entries.filter(function(e) { return e.photo; }).length;
+document.getElementById('entryCount').textContent =
+entries.length + (entries.length === 1 ? ' entry' : ' entries') + (photoCount ? ' (' + photoCount + ' with photos)' : '');
+
+var hasEntries = entries.length > 0;
+document.getElementById('entriesHeader').style.display = hasEntries ? 'flex' : 'none';
+document.getElementById('searchWrap').style.display = hasEntries ? 'block' : 'none';
+
+if (sorted.length === 0 && entries.length === 0) {
+list.innerHTML = '<div class="empty-state"><div class="icon">&#127749;</div><p>Start your gratitude practice today.<br>Your first entry awaits.</p></div>';
+return;
+}
+
+if (sorted.length === 0) {
+list.innerHTML = '<div class="empty-state"><p>No entries match your search.</p></div>';
+return;
+}
+
+var html = '';
+for (var i = 0; i < sorted.length; i++) {
+var entry = sorted[i];
+var d = new Date(entry.date);
+var dateStr = d.toLocaleDateString('en-US', {
+weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+});
+var timeStr = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
+html += '<div class="entry-card">';
+html += '<div class="entry-date">';
+html += '<span>' + dateStr + ' &middot; ' + timeStr + '</span>';
+html += '<button class="entry-delete" onclick="deleteEntry(\'' + entry.id + '\')">Delete</button>';
+html += '</div>';
+html += '<div class="entry-text">' + escapeHtml(entry.text) + '</div>';
+if (entry.photo) {
+html += '<img class="entry-photo" src="' + entry.photo + '" alt="Gratitude photo" onclick="openLightbox(this.src)" loading="lazy">';
+}
+html += '</div>';
+}
+list.innerHTML = html;
+}
+
+function escapeHtml(str) {
+var div = document.createElement('div');
+div.textContent = str;
+return div.innerHTML;
+}
+
+function toggleSort() {
+sortNewest = !sortNewest;
+document.getElementById('sortBtn').textContent = sortNewest ? 'Newest first' : 'Oldest first';
+renderEntries();
+}
+
+function openLightbox(src) {
+document.getElementById('lightboxImg').src = src;
+document.getElementById('lightbox').classList.add('active');
+}
+
+function closeLightbox() {
+document.getElementById('lightbox').classList.remove('active');
+}
+
+function exportData() {
+var blob = new Blob([JSON.stringify(entries, null, 2)], { type: 'application/json' });
+var url = URL.createObjectURL(blob);
+var a = document.createElement('a');
+a.href = url;
+a.download = 'gratitude-journal-' + new Date().toISOString().split('T')[0] + '.json';
+a.click();
+URL.revokeObjectURL(url);
+showToast('Exported!');
+}
+
+function importData(input) {
+var file = input.files[0];
+if (!file) return;
+var reader = new FileReader();
+reader.onload = function(e) {
+try {
+var imported = JSON.parse(e.target.result);
+if (!Array.isArray(imported)) throw new Error();
+
+var existingIds = {};
+entries.forEach(function(e) { existingIds[e.id] = true; });
+var added = 0;
+imported.forEach(function(entry) {
+if (!existingIds[entry.id] && entry.text && entry.date) {
+entries.push(entry);
+added++;
+}
+});
+
+entries.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+
+if (!saveEntries()) {
+loadEntries();
+showToast('Import too large for storage');
+return;
+}
+
+renderEntries();
+updateStorage();
+showToast('Imported ' + added + ' entries');
+} catch (err) {
+showToast('Invalid file format');
+}
+};
+reader.readAsText(file);
+input.value = '';
+}
+
+function toggleSettings() {
+document.getElementById('settingsPanel').classList.toggle('active');
+}
+
+document.addEventListener('click', function(e) {
+var panel = document.getElementById('settingsPanel');
+var btn = document.querySelector('.settings-toggle');
+if (panel.classList.contains('active') && !panel.contains(e.target) && !btn.contains(e.target)) {
+panel.classList.remove('active');
+}
+});
+
+function showToast(msg) {
+var toast = document.getElementById('toast');
+toast.textContent = msg;
+toast.classList.add('show');
+setTimeout(function() { toast.classList.remove('show'); }, 2200);
+}
+
+document.addEventListener('keydown', function(e) {
+if (e.key === 'Escape') {
+closeLightbox();
+closeDeleteDialog();
+}
+});
+
+init();
+</script>
+</body>
+</html>
